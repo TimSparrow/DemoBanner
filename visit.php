@@ -93,10 +93,28 @@ class Visit
 		if(!$this->uid) {
 			throw new \RuntimeException('Cannot update counter for an uninitialized visit');
 		}
+		// timestamp is updated by mysql
 		$select = "UPDATE ". $this->table . " SET view_count = view_count + 1 WHERE uid = ?";
 		$st = $this->db->prepare($select);
 		if(!$st->execute([$this->uid])) {
 			throw new \RuntimeException('Failed to update page view count');
+		}
+	}
+
+	/**
+	 * Inserts new user data
+	 * @param String $ip
+	 * @param String $userAgent
+	 * @param String $page
+	 * @throws \RuntimeException
+	 */
+	protected function addVisit($ip, $userAgent, $page)
+	{
+		$query = "INSERT INTO ". $this->table .
+				" SET ip_address = ?, user_agent = ?, page_url = ?, views_count = 1";
+		$st = $this->db->prepare($query);
+		if(!$st->execute([$ip, $userAgent, $page])) {
+			throw new \RuntimeException('Failed to save user visit data');
 		}
 	}
 }
