@@ -11,13 +11,13 @@ require_once './visit.php'; // db model class for page visits
 $visit = new Visit($dbc);
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
 $ip = $_SERVER['REMOTE_ADDR'];
-$page = $_SERVER['REQUEST_URI'];
+$page = $_SERVER['HTTP_REFERER'];
 $visit->save($ip, $userAgent, $page);
 
 // show banner to user - banner is a static image, as banner selection mechanism is not specified.
 // select banner to show - just one for demo
 // detect banner image type/ content type - hardcode for demo
-header('Content-type : image/jpeg');
-$bannerImage = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/img/radio.jpg');
+header('Content-Type:image/jpeg');
+$bannerImage = file_get_contents(__DIR__ . '/img/radio.jpg');
 echo $bannerImage; // output the banner
 exit;

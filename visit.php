@@ -22,6 +22,7 @@ class Visit
 	protected $db;
 	protected $uid; // id of the visit if updating
 	protected $table = 'shows';
+	private $log = null;
 
 	/**
 	 * Establish a database connection on connect
@@ -52,6 +53,7 @@ class Visit
 		}
 		catch (\Exception $x) {
 			$this->db->rollBack();
+			trigger_error($x->getMessage(), E_USER_WARNING);
 		}
 	}
 
@@ -75,13 +77,10 @@ class Visit
 			throw new \RuntimeException('Failed to query visitor data');
 		}
 		$row = $st->fetch(PDO::FETCH_ASSOC);
-		if (null === $row) {
-			return false; // no previous visits by this user are recorded
-		}
-		else {
+		if(is_array($row)) {
 			$this->uid = $row['uid'];
-			return true;
 		}
+		return is_array($row);
 	}
 
 	/**
@@ -94,11 +93,13 @@ class Visit
 			throw new \RuntimeException('Cannot update counter for an uninitialized visit');
 		}
 		// timestamp is updated by mysql
-		$select = "UPDATE ". $this->table . " SET view_count = view_count + 1 WHERE uid = ?";
-		$st = $this->db->prepare($select);
+		$query = "UPDATE ". $this->table . " SET views_count = views_count+1 WHERE uid = ?";
+		trigger_error(sprintf("Executing query: %s for uid=%d", $query, $this->uid), E_USER_NOTICE);
+		$st = $this->db->prepare($query);
 		if(!$st->execute([$this->uid])) {
 			throw new \RuntimeException('Failed to update page view count');
 		}
+
 	}
 
 	/**
@@ -115,6 +116,21 @@ class Visit
 		$st = $this->db->prepare($query);
 		if(!$st->execute([$ip, $userAgent, $page])) {
 			throw new \RuntimeException('Failed to save user visit data');
+		}
+	}
+
+	protected function log($message)
+	{
+		if(null === $this->log) {
+			$this->log = fopen('log.log', 'a+');
+		}
+		fputs($this->log, $message . "\n");
+	}
+
+	public function __destruct()
+	{
+		if(null !== $this->log) {
+			fclose($this->log);
 		}
 	}
 }
