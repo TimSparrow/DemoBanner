@@ -22,7 +22,6 @@ class Visit
 	protected $db;
 	protected $uid; // id of the visit if updating
 	protected $table = 'shows';
-	private $log = null;
 
 	/**
 	 * Establish a database connection on connect
@@ -94,7 +93,6 @@ class Visit
 		}
 		// timestamp is updated by mysql
 		$query = "UPDATE ". $this->table . " SET views_count = views_count+1 WHERE uid = ?";
-		trigger_error(sprintf("Executing query: %s for uid=%d", $query, $this->uid), E_USER_NOTICE);
 		$st = $this->db->prepare($query);
 		if(!$st->execute([$this->uid])) {
 			throw new \RuntimeException('Failed to update page view count');
@@ -119,18 +117,4 @@ class Visit
 		}
 	}
 
-	protected function log($message)
-	{
-		if(null === $this->log) {
-			$this->log = fopen('log.log', 'a+');
-		}
-		fputs($this->log, $message . "\n");
-	}
-
-	public function __destruct()
-	{
-		if(null !== $this->log) {
-			fclose($this->log);
-		}
-	}
 }
