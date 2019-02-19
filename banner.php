@@ -7,7 +7,6 @@
 require_once './conf/db_config.php'; // database credentials saved in separate file, array dbc
 require_once './visit.php'; // db model class for page visits
 
-
 // record banner hit/visit
 $visit = new Visit($dbc);
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -15,4 +14,10 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $page = $_SERVER['REQUEST_URI'];
 $visit->save($ip, $userAgent, $page);
 
-// show banner to user - banner is a static image, as banner selectio n mechanism is not specified.
+// show banner to user - banner is a static image, as banner selection mechanism is not specified.
+// select banner to show - just one for demo
+// detect banner image type/ content type - hardcode for demo
+header('Content-type : image/jpeg');
+$bannerImage = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/img/radio.jpg');
+echo $bannerImage; // output the banner
+exit;
