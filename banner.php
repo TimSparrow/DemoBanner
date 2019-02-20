@@ -11,7 +11,7 @@ require_once './visit.php'; // db model class for page visits
 $visit = new Visit($dbc);
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
 $ip = $_SERVER['REMOTE_ADDR'];
-$page = $_SERVER['HTTP_REFERER'];
+$page = $_SERVER['HTTP_REFERER']; // 
 $visit->save($ip, $userAgent, $page);
 
 // show banner to user - banner is a static image, as banner selection mechanism is not specified.
@@ -20,4 +20,4 @@ $visit->save($ip, $userAgent, $page);
 header('Content-Type:image/jpeg');
 $bannerImage = file_get_contents(__DIR__ . '/img/radio.jpg');
 echo $bannerImage; // output the banner
-exit;
+exit; // force exit to avoid possible error/warning messages corrupting the image output
